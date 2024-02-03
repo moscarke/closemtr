@@ -98,7 +98,7 @@ function getClosestStop (){
 				if (apiReceived == allLine.length){
 					document.getElementById("station").innerText = allLine[0]["name"] + "站";
 					document.getElementById("waiting").style.display = "none";
-					document.getElementById("etaist").innerHTML = y + "</div>" + x;
+					document.getElementById("etaList").innerHTML = y + "</div>" + x;
 					document.getElementById(allLine[0]["line"]).style.display = "";
 				}
 			} else {
