@@ -87,7 +87,7 @@ function getClosestStop (){
 					}
 					x = x + "</table>";
 				}
-				y += "<button class='btnOne' onclick='changeTable(\"" + allLine[i]["line"] + "\")' style='border-radius: 5px'>" + mtrLineName(allLine[i]["line"]) + "</button>";
+				y += "<button class='btnOne' id='btn" + allLine[i]["line"] + "' onclick='changeTable(\"" + allLine[i]["line"] + "\")' style='border-radius: 5px'>" + mtrLineName(allLine[i]["line"]) + "</button>";
 				if (apiReceived == allLine.length){
 					document.getElementById("station").innerText = allLine[0]["name"] + "站";
 					document.getElementById("etaList").innerHTML = y + "</div>" + x;
