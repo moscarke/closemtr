@@ -23,7 +23,6 @@ function showPosition(position) {
 	let url = "https://script.google.com/macros/s/AKfycbzo06TDJr1oBadb6q7f9TTssuKwrBNc8UpQKEGJDXKriMxG7X4-3OxdH3uWTJ3Dsyn-Qg/exec?q=markdown&des=MTR-Info&lat=" + lat + "&lng=" + lng;
 	xhttpr.open("GET", url, true);
 	xhttpr.send();
-	console.log("maps.google.com/?q=" + lat + "," + lng);
 	received++
 	if (received == 2){
 		getClosestStop();
