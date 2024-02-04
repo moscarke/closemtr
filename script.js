@@ -90,8 +90,9 @@ function getClosestStop (){
 				y += "<button class='btnOne' onclick='changeTable(\"" + allLine[i]["line"] + "\")' style='border-radius: 5px'>" + mtrLineName(allLine[i]["line"]) + "</button>";
 				if (apiReceived == allLine.length){
 					document.getElementById("station").innerText = allLine[0]["name"] + "站";
-					document.getElementById("waiting").style.display = "none";
 					document.getElementById("etaList").innerHTML = y + "</div>" + x;
+					document.getElementById("btn" + allLine[0]["line"]).style["background-color"] = "#006B00";
+					document.getElementById("waiting").style.display = "none";
 					document.getElementById(allLine[0]["line"]).style.display = "";
 				}
 			} else {
@@ -107,7 +108,12 @@ function changeTable (line){
 	for (let i = 0; i < collection.length; i++){
 		collection[i].style.display = "none";
 	}
+	const btnCollection = document.getElementsByTagName("button");
+	for (let i = 0; i < btnCollection.length; i++){
+		btnCollection[i].style["background-color"] = "#0B0";
+	}
 	document.getElementById(line).style.display = "";
+	document.getElementById("btn" + line).style["background-color"] = "#006B00";
 }
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
