@@ -41,7 +41,7 @@ function showPosition(position) {
 
 function getClosestStop (){
 	let shortestDistance = getDistanceFromLatLonInKm(lat, lng, parseFloat(response[0]["lat"]), parseFloat(response[0]["long"])), distance, stop, stop_id, allLine = [], apiReceived = 0, x = "";
-	let y = "<div class='centerDiv'>"
+	let y = "<div class='centerDiv'>", note = "";
 	for (let i = 0; i < response.length; i++){
 		distance = getDistanceFromLatLonInKm(lat, lng, parseFloat(response[i]["lat"]), parseFloat(response[i]["long"]));
 		if (distance < shortestDistance){
@@ -54,7 +54,6 @@ function getClosestStop (){
 	for (let i = 0; i < response.length; i++){
 		if (stop == response[i]["name"]){
 			allLine.push({line: response[i]["line"], sta: response[i]["code"], name: response[i]["name"]});
-			
 		}
 	}
 	
@@ -69,31 +68,47 @@ function getClosestStop (){
 		xhttpr.onload = ()=> {
 			if (xhttpr.status == 200){
 				raw = JSON.parse(xhttpr.response);
-				list = raw["data"][lineStation];
 				apiReceived++;
-				x = x + "<table id='" + allLine[i]["line"] + "' class='timetable' style='display: none'><tr><td><strong>抵站時間</strong></td><td><strong>終點站</strong></td><td><strong>月台</strong></td></tr>";
-				if (list["UP"] != null){
-					for (let j = 0; j < list["UP"].length; j++){
-						etaTime = new Date(list["UP"][j]["time"]);
-						etaTime = etaTime.toLocaleTimeString('en-HK', {hourCycle: 'h23'});
-						chunk += "<tr><td>" + etaTime + "</td><td>" + response[response.map(e => e.code).indexOf(list["UP"][j]["dest"])]["name"] + "</td><td>" + list["UP"][j]["plat"] + "</td></tr>";
-						destination.push(response[response.map(e => e.code).indexOf(list["UP"][j]["dest"])]["name"]);
+				if (raw["status"] == 0){
+					x += "<table id='" + allLine[i]["line"] + "' class='timetable' style='display: none'><tr><td>Error: " + raw["message"] + "</td></tr></table>"
+				} else {
+					list = raw["data"][lineStation];
+					x = x + "<table id='" + allLine[i]["line"] + "' class='timetable' style='display: none'><tr><td><strong>抵站時間</strong></td><td><strong>終點站</strong></td><td><strong>月台</strong></td></tr>";
+					if (list["UP"] != null){
+						for (let j = 0; j < list["UP"].length; j++){
+							note = "";
+							if (allLine[i]["line"] == "EAL"){
+								if (list["UP"][j]["route"] == "RAC"){
+									note = "<span style='font-size: 75%'>經馬場</span>";
+								}
+							}
+							etaTime = new Date(list["UP"][j]["time"]);
+							etaTime = etaTime.toLocaleTimeString('en-HK', {hourCycle: 'h23'});
+							chunk += "<tr><td>" + etaTime + "</td><td>" + response[response.map(e => e.code).indexOf(list["UP"][j]["dest"])]["name"] + note + "</td><td>" + list["UP"][j]["plat"] + "</td></tr>";
+							destination.push(response[response.map(e => e.code).indexOf(list["UP"][j]["dest"])]["name"]);
+						}
+						destination = [...new Set(destination)];
+						x = x + "<tr><td colspan='3' style='background-color: #339933;'>往： " + destination.join("/") + "</td></tr>" + chunk;
 					}
-					destination = [...new Set(destination)];
-					x = x + "<tr><td colspan='3' style='background-color: #339933;'>往： " + destination.join("/") + "</td></tr>" + chunk;
-				}
-				chunk = "", destination = [];
-				if (list["DOWN"] != null){
-					for (let j = 0; j < list["DOWN"].length; j++){
-						etaTime = new Date(list["DOWN"][j]["time"]);
-						etaTime = etaTime.toLocaleTimeString('en-HK', {hourCycle: 'h23'});
-						chunk += "<tr><td>" + etaTime + "</td><td>" + response[response.map(e => e.code).indexOf(list["DOWN"][j]["dest"])]["name"] + "</td><td>" + list["DOWN"][j]["plat"] + "</td></tr>";
-						destination.push(response[response.map(e => e.code).indexOf(list["DOWN"][j]["dest"])]["name"]);
+					chunk = "", destination = [];
+					if (list["DOWN"] != null){
+						for (let j = 0; j < list["DOWN"].length; j++){
+							note = "";
+							if (allLine[i]["line"] == "EAL"){
+								if (list["UP"][j]["route"] == "RAC"){
+									note = "<span style='font-size: 75%'>經馬場</span>";
+								}
+							}
+							etaTime = new Date(list["DOWN"][j]["time"]);
+							etaTime = etaTime.toLocaleTimeString('en-HK', {hourCycle: 'h23'});
+							chunk += "<tr><td>" + etaTime + "</td><td>" + response[response.map(e => e.code).indexOf(list["DOWN"][j]["dest"])]["name"] + note + "</td><td>" + list["DOWN"][j]["plat"] + "</td></tr>";
+							destination.push(response[response.map(e => e.code).indexOf(list["DOWN"][j]["dest"])]["name"]);
+						}
+						destination = [...new Set(destination)];
+						x = x + "<tr><td colspan='3' style='background-color: #339933;'>往： " + destination.join("/") + "</td></tr>" + chunk;
 					}
-					destination = [...new Set(destination)];
-					x = x + "<tr><td colspan='3' style='background-color: #339933;'>往： " + destination.join("/") + "</td></tr>" + chunk;
+					x = x + "</table>";
 				}
-				x = x + "</table>";
 				y += "<button class='btnOne' onclick='changeTable(\"" + allLine[i]["line"] + "\")' style='border-radius: 5px'>" + mtrLineName(allLine[i]["line"]) + "</button>";
 				if (apiReceived == allLine.length){
 					document.getElementById("station").innerText = allLine[0]["name"] + "站";
